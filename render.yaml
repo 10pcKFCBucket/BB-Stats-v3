@@ -1,0 +1,15 @@
+# Render reads this file automatically when you connect the repo — it
+# tells Render how to build and start the app so you don't have to
+# click through those settings by hand in the dashboard.
+#
+# buildCommand runs once per deploy. Running init_db.py here means a
+# fresh softball.db is created every time you deploy — see the note in
+# the deployment write-up about what that does and doesn't mean for
+# your data.
+services:
+  - type: web
+    name: softball-stats
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python init_db.py"
+    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT"

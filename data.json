@@ -1,0 +1,8 @@
+[
+  { "name": "J. Alvarez", "games": 14, "atBats": 52, "hits": 21, "walks": 6, "homeRuns": 3, "rbi": 15, "runs": 0 },
+  { "name": "T. Brooks",  "games": 14, "atBats": 49, "hits": 14, "walks": 9, "homeRuns": 1, "rbi": 8 , "runs": 0 },
+  { "name": "S. Chen",    "games": 13, "atBats": 45, "hits": 18, "walks": 4, "homeRuns": 0, "rbi": 11, "runs": 0 },
+  { "name": "M. Diaz",    "games": 12, "atBats": 38, "hits": 9,  "walks": 3, "homeRuns": 2, "rbi": 7 , "runs": 0 },
+  { "name": "R. Ellis",   "games": 14, "atBats": 51, "hits": 22, "walks": 7, "homeRuns": 4, "rbi": 19, "runs": 0 },
+  { "name": "K. Foster",  "games": 11, "atBats": 33, "hits": 8,  "walks": 5, "homeRuns": 0, "rbi": 4 , "runs": 0 }
+]

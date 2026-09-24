@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Stats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>BB Stats v3</h1>
+    <p class="subtitle">Powered by Claude AI and Joe Ham</p>
+  </header>
+
+  <nav class="navbar">
+    <img src="brunswick-bombers.png" width="50" height="50">
+    <ul class="nav-links">
+        <li><a href="home.html">Home</a></li>
+        <li>
+            <div class="dropdown">
+                <button class="dropbtn">Stats</button>
+                <div class="dropdown-content">
+                    <a href="home.html">Player Profiles</a>
+                    <a href="home.html">Full Sheet</a>
+                    <a href="home.html">Scorecards</a>
+                    <a href="home.html">Team Leaders</a>
+                    <a href="home.html">Longest Streaks</a>
+                    <a href="home.html">Advanced Stats</a>
+                    <a href="home.html">Pitch Level Data</a>
+                </div>
+            </div>
+        </li>
+        <li><a href="home.html">Calendar</a></li>
+        <li><a href="https://www.youtube.com/@BrunswickBombers" target="_blank">YouTube</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <input
+      type="text"
+      id="player-search"
+      placeholder="Filter by player name…"
+      aria-label="Filter by player name"
+    >
+
+    <!-- We don't write any <tr> rows by hand here — JavaScript builds them
+         from data.json once the page loads. This is the whole point of
+         step 2: data lives in one file, the page just renders whatever
+         is in it.
+
+         Each <th> below has a data-key attribute matching a field name
+         in data.json. Step 3 uses that attribute to know which field to
+         sort by when a header is clicked, instead of writing one
+         click handler per column. -->
+    <table id="stats-table">
+      <thead>
+        <tr>
+          <th data-key="name" class="sortable">Player</th>
+          <th data-key="games" class="sortable">G</th>
+          <th data-key="atBats" class="sortable">AB</th>
+          <th data-key="hits" class="sortable">H</th>
+          <th data-key="singles" class="sortable">1B</th>
+          <th data-key="walks" class="sortable">BB</th>
+          <th data-key="homeRuns" class="sortable">HR</th>
+          <th data-key="rbi" class="sortable">RBI</th>
+          <th data-key="runs" class="sortable">Runs</th>
+          <th data-key="average" class="sortable">AVG</th>
+          <th data-key="obp" class="sortable">OBP</th>
+        </tr>
+      </thead>
+      <tbody id="stats-body">
+        <!-- filled in by script.js -->
+        <tr><td colspan="8" class="loading">Loading stats…</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <footer>
+    <p>Data as of last game. Batting average = hits ÷ at-bats.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

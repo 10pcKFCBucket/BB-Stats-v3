@@ -1,0 +1,239 @@
+:root {
+  --field-green: #1f3d2b;
+  --field-green-light: #2d5940;
+  --cream: #f7f4ec;
+  --charcoal: #26241f;
+  --stitch-red: #a5372f;
+  --line: #ddd7c8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--charcoal);
+  font-family: 'Source Sans 3', sans-serif;
+  line-height: 1.5;
+}
+
+header {
+  background: var(--field-green);
+  color: var(--cream);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+}
+
+/* Style the navigation container */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    font-size: 24px;
+    padding: 0px 30px;
+    font-family: Arial, sans-serif;
+}
+
+/* Brand/Logo Styling */
+.navbar .logo {
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Align the links horizontally */
+.navbar .nav-links {
+    display: flex;
+    list-style: none; /* Removes default bullet points */
+}
+
+/* Style individual link spaces */
+.navbar .nav-links li {
+    padding: 0 15px;
+}
+
+/* Typography and clear styling for links */
+.navbar .nav-links a {
+    color: #fff;
+    text-decoration: none; /* Removes standard underline */
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+/* Visual response when hovering over links */
+.navbar .nav-links a:hover {
+    color: #04AA6D; /* Changes to a vibrant green */
+}
+
+/* Container for the entire dropdown structure */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Style the button or link that triggers the menu */
+.dropbtn {
+  background-color: #333;
+  color: white;
+  padding: 10px 10px;
+  font-size: 19px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+/* The actual dropdown menu (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Individual links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change link color on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* MAGIC STEP: Show the menu when the user hovers over the button */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the button color when the menu is active */
+.dropdown:hover .dropbtn {
+  background-color: #234a34;
+}
+
+h1 {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.4rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #c9dccd;
+  font-size: 1rem;
+}
+
+main {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+#player-search {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  color: var(--charcoal);
+}
+
+#player-search:focus {
+  outline: 2px solid var(--field-green-light);
+  outline-offset: 1px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+thead th {
+  background: var(--field-green-light);
+  color: var(--cream);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+}
+
+thead th:first-child {
+  text-align: left;
+  padding-left: 0.9rem;
+}
+
+thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+thead th.sortable:hover {
+  background: #234a34;
+}
+
+thead th.sort-asc::after,
+thead th.sort-desc::after {
+  margin-left: 0.35rem;
+  font-size: 0.75em;
+  opacity: 0.85;
+}
+
+thead th.sort-asc::after {
+  content: "▲";
+}
+
+thead th.sort-desc::after {
+  content: "▼";
+}
+
+td {
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+td.player-name {
+  text-align: left;
+  padding-left: 0.9rem;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+  background: #fbfaf6;
+}
+
+tbody tr:hover {
+  background: #f0ece0;
+}
+
+.loading {
+  padding: 2rem;
+  color: #8a8577;
+  font-style: italic;
+}
+
+footer {
+  max-width: 720px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1.5rem;
+  font-size: 0.85rem;
+  color: #8a8577;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
