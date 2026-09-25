@@ -38,7 +38,7 @@ async function loadSeasons() {
 
     const careerOption = document.createElement("option");
     careerOption.value = "career";
-    careerOption.textContent = "Career (All Years)";
+    careerOption.textContent = "Career";
     yearSelect.appendChild(careerOption);
 
     // Map preserves insertion order, and the API already returns

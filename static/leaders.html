@@ -11,7 +11,7 @@
 <body>
 
   <header>
-    <h1>BB Stats v3.1</h1>
+    <h1>Brunswick Bombers</h1>
     <p class="subtitle">Powered by Claude AI and Joe Ham</p>
   </header>
 
@@ -33,18 +33,22 @@
                 </div>
             </div>
         </li>
-        <li><a href="home.html">Calendar</a></li>
+        <li><a href="index.html">Calendar</a></li>
         <li><a href="https://www.youtube.com/@BrunswickBombers" target="_blank">YouTube</a></li>
     </ul>
   </nav>
 
   <main>
-    <input
-      type="text"
-      id="player-search"
-      placeholder="Filter by player name…"
-      aria-label="Filter by player name"
-    >
+      <div class="controls">
+        <select id="year-select" aria-label="Filter by year"></select>
+        <select id="league-select" aria-label="Filter by league"></select>
+        <input
+          type="text"
+          id="player-search"
+          placeholder="Filter by player name…"
+          aria-label="Filter by player name"
+        >
+      </div>
 
     <!-- We don't write any <tr> rows by hand here — JavaScript builds them
          from data.json once the page loads. This is the whole point of
@@ -60,21 +64,26 @@
         <tr>
           <th data-key="name" class="sortable">Player</th>
           <th data-key="games" class="sortable">G</th>
+          <th data-key="plateAppearances" class="sortable">PA</th>
           <th data-key="atBats" class="sortable">AB</th>
           <th data-key="hits" class="sortable">H</th>
           <th data-key="singles" class="sortable">1B</th>
           <th data-key="doubles" class="sortable">2B</th>
-          <th data-key="walks" class="sortable">BB</th>
+          <th data-key="triples" class="sortable">3B</th>
           <th data-key="homeRuns" class="sortable">HR</th>
+          <th data-key="walks" class="sortable">BB</th>
           <th data-key="rbi" class="sortable">RBI</th>
           <th data-key="runs" class="sortable">Runs</th>
+          <th data-key="totalBases" class="sortable">TB</th>
           <th data-key="average" class="sortable">AVG</th>
           <th data-key="obp" class="sortable">OBP</th>
+          <th data-key="slg" class="sortable">SLG</th>
+          <th data-key="ops" class="sortable">OPS</th>
         </tr>
       </thead>
       <tbody id="stats-body">
         <!-- filled in by script.js -->
-        <tr><td colspan="8" class="loading">Loading stats…</td></tr>
+        <tr><td colspan="17" class="loading">Loading stats…</td></tr>
       </tbody>
     </table>
   </main>
