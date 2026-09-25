@@ -1,0 +1,25 @@
+# Run this on the NAS (via SSH, from inside this folder) with:
+#   docker compose up -d --build
+#
+# Container Station can also import this file directly if you'd rather
+# use the GUI: Container Station > Create > Create Application, then
+# paste this file's contents in.
+
+services:
+  softball-stats:
+    build: .
+    container_name: softball-stats
+    restart: unless-stopped
+    ports:
+      # host_port:container_port — change 8080 if that port is already
+      # used by something else on your NAS (QTS itself often uses 8080).
+      - "8090:5000"
+    volumes:
+      # Left side is a real folder on the NAS that gets created next to
+      # this file; right side is where the app expects to find it
+      # (see DB_FILE in the Dockerfile). This is what makes your stats
+      # survive container rebuilds.
+      - ./data:/app/data
+      - ./static:/app/static
+      - ./app.py:/app/app.py
+      - ./init_db.py:/app/init_db.py
