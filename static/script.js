@@ -52,15 +52,21 @@ function render(players) {
       <tr>
         <td class="player-name">${player.name}</td>
         <td>${player.games}</td>
+        <td>${player.plateAppearances}</td>
         <td>${player.atBats}</td>
         <td>${player.hits}</td>
         <td>${player.singles}</td>
+        <td>${player.doubles}</td>
+        <td>${player.triples}</td>
         <td>${player.walks}</td>
         <td>${player.homeRuns}</td>
         <td>${player.rbi}</td>
         <td>${player.runs}</td>
+        <td>${player.totalBases}</td>
         <td>${player.average}</td>
         <td>${player.obp}</td>
+        <td>${player.slg}</td>
+        <td>${player.ops}</td>
       </tr>
     `)
     .join("");

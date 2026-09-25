@@ -15,11 +15,13 @@ services:
       # used by something else on your NAS (QTS itself often uses 8080).
       - "8090:5000"
     volumes:
-      # Left side is a real folder on the NAS that gets created next to
-      # this file; right side is where the app expects to find it
-      # (see DB_FILE in the Dockerfile). This is what makes your stats
-      # survive container rebuilds.
+      # Left side is a real folder/file on the NAS; right side is where
+      # the app looks for it inside the container. Mounting these
+      # individually (rather than the whole project) means edits you
+      # make on the NAS take effect without needing --build again —
+      # gunicorn's --reload flag notices the change and restarts itself.
       - ./data:/app/data
       - ./static:/app/static
       - ./app.py:/app/app.py
-      - ./init_db.py:/app/init_db.py
+      - ./import_data.py:/app/import_data.py
+      - ./schema.sql:/app/schema.sql
