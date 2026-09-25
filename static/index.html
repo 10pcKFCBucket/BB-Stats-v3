@@ -39,12 +39,15 @@
   </nav>
 
   <main>
-    <input
-      type="text"
-      id="player-search"
-      placeholder="Filter by player name…"
-      aria-label="Filter by player name"
-    >
+      <div class="controls">
+        <select id="season-select" aria-label="Filter by season or year"></select>
+        <input
+          type="text"
+          id="player-search"
+          placeholder="Filter by player name…"
+          aria-label="Filter by player name"
+        >
+      </div>
 
     <!-- We don't write any <tr> rows by hand here — JavaScript builds them
          from data.json once the page loads. This is the whole point of
@@ -79,7 +82,7 @@
       </thead>
       <tbody id="stats-body">
         <!-- filled in by script.js -->
-        <tr><td colspan="8" class="loading">Loading stats…</td></tr>
+        <tr><td colspan="17" class="loading">Loading stats…</td></tr>
       </tbody>
     </table>
   </main>

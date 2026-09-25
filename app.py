@@ -45,6 +45,37 @@ def latest_season_id(db):
     ).fetchone()
     return row["id"] if row else None
 
+def resolve_season_ids(db):
+    """
+    Figures out which season_id(s) a request should include, based on
+    query params:
+      ?season_id=3   -> exactly that one season (a specific year+league)
+      ?year=2024     -> every season matching that year, combined —
+                         useful once a year has more than one league
+      (neither)      -> just the most recent season
+    Returns a list so the caller can always do "WHERE season_id IN (...)"
+    the same way regardless of which case applies.
+    """
+    season_id = request.args.get("season_id")
+    if season_id:
+        return [int(season_id)]
+
+    year = request.args.get("year")
+    if year:
+        rows = db.execute("SELECT id FROM seasons WHERE year = ?", (year,)).fetchall()
+        return [row["id"] for row in rows]
+
+    latest = latest_season_id(db)
+    return [latest] if latest is not None else []
+
+
+@app.route("/api/seasons")
+def get_seasons():
+    db = get_db()
+    rows = db.execute(
+        "SELECT id, year, league FROM seasons ORDER BY year DESC, league"
+    ).fetchall()
+    return jsonify([dict(row) for row in rows])
 
 @app.route("/api/players")
 def get_players():
@@ -53,28 +84,22 @@ def get_players():
     # ?season=2024 picks a specific year; with none given, default to
     # the most recent season in the database rather than mixing years
     # together, which would silently produce meaningless totals.
-    season_year = request.args.get("season")
-    if season_year:
-        season_row = db.execute(
-            "SELECT id FROM seasons WHERE year = ?", (season_year,)
-        ).fetchone()
-        season_id = season_row["id"] if season_row else None
-    else:
-        season_id = latest_season_id(db)
+    season_ids = resolve_season_ids(db)
 
-    if season_id is None:
+    if not season_ids:
         return jsonify([])
 
+    placeholders = ",".join("?" for _ in season_ids)
     rows = db.execute(
-        """
+        f"""
         SELECT p.id, p.name,
                pa.result, pa.rbi, pa.scored, pa.game_id
         FROM plate_appearances pa
         JOIN players p ON pa.player_id = p.id
         JOIN games g ON pa.game_id = g.id
-        WHERE g.season_id = ?
+        WHERE g.season_id IN ({placeholders})
         """,
-        (season_id,),
+        season_ids,
     ).fetchall()
 
     # Aggregate in Python rather than SQL here — the AB/hit

@@ -10,34 +10,84 @@ let allPlayers = [];          // the full list, loaded once from the API
 let sortKey = null;           // which field we're currently sorted by
 let sortDirection = 1;        // 1 = ascending, -1 = descending
 
-async function loadStats() {
-  const tableBody = document.getElementById("stats-body");
+async function init() {
+  await loadSeasons();
+  setupSorting();
+  setupFiltering();
+  document.getElementById("season-select").addEventListener("change", loadStats);
+  await loadStats();
+}
+
+async function loadSeasons() {
+  const select = document.getElementById("season-select");
 
   try {
-    // Only this line changed from step 2/3: instead of fetching a static
-    // JSON file, we're fetching from our own Flask route. Same fetch(),
-    // same .json(), same shape of data coming back — the server is just
-    // building that JSON from a database query instead of reading a
-    // file off disk. Everything below this line didn't need to change.
-    const response = await fetch("/api/players");
+    const response = await fetch("/api/seasons");
+    const seasons = await response.json();
+
+    // Group seasons by year, in the order the API already gives them
+    // (most recent year first). A Map (rather than a plain object)
+    // keeps that order intact when we loop back over it below.
+    const byYear = new Map();
+    seasons.forEach((season) => {
+      if (!byYear.has(season.year)) byYear.set(season.year, []);
+      byYear.get(season.year).push(season);
+    });
+
+    select.innerHTML = "";
+
+    for (const [year, seasonsInYear] of byYear) {
+      // Only offer an "All Leagues" option for years that actually
+      // have more than one league — no point cluttering the dropdown
+      // with a redundant duplicate entry for years with just one.
+      if (seasonsInYear.length > 1) {
+        const allOption = document.createElement("option");
+        allOption.value = `year:${year}`;
+        allOption.textContent = `${year} — All Leagues`;
+        select.appendChild(allOption);
+      }
+
+      seasonsInYear.forEach((season) => {
+        const option = document.createElement("option");
+        option.value = `season:${season.id}`;
+        option.textContent = `${year} — ${season.league}`;
+        select.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error("Couldn't load seasons:", error);
+  }
+}
+
+async function loadStats() {
+  const tableBody = document.getElementById("stats-body");
+  const select = document.getElementById("season-select");
+
+  // The dropdown's selected value is either "season:<id>" or
+  // "year:<year>" (see loadSeasons above) — split on the colon to
+  // figure out which query param the API expects.
+  const [kind, value] = (select.value || "").split(":");
+  const queryParam = kind === "year" ? `year=${value}` : `season_id=${value}`;
+
+  try {
+    const response = await fetch(`/api/players?${queryParam}`);
     const players = await response.json();
 
-    // Add a computed "average" field to each player up front, so sorting
-    // by AVG has a real number to compare (we'll still *display* it as
-    // ".347", but we sort on the underlying number).
     allPlayers = players.map((player) => ({
       ...player,
       average2: player.atBats === 0 ? 0 : player.hits / player.atBats,
     }));
 
-    render(allPlayers);
-    setupSorting();
-    setupFiltering();
+    // Re-apply whatever sort/search is already active, rather than a
+    // plain render() — this keeps your sort column and search text in
+    // place when you switch seasons instead of resetting them.
+    applySortAndFilter();
   } catch (error) {
     console.error("Couldn't load stats:", error);
     tableBody.innerHTML = `<tr><td colspan="8" class="loading">Couldn't load stats. Check the console.</td></tr>`;
   }
 }
+
 
 function render(players) {
   const tableBody = document.getElementById("stats-body");
@@ -144,4 +194,4 @@ function applySortAndFilter() {
   render(visible);
 }
 
-loadStats();
+init();

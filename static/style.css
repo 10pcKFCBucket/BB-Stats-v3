@@ -139,6 +139,29 @@ main {
   padding: 0 1.5rem;
 }
 
+.controls {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+#season-select {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  color: var(--charcoal);
+  background: white;
+  flex: 0 0 auto;
+}
+
+#season-select:focus {
+  outline: 2px solid var(--field-green-light);
+  outline-offset: 1px;
+}
+
 #player-search {
   width: 100%;
   padding: 0.6rem 0.8rem;
