@@ -81,15 +81,20 @@ def get_seasons():
 def get_players():
     db = get_db()
 
-    # ?season=2024 picks a specific year; with none given, default to
-    # the most recent season in the database rather than mixing years
-    # together, which would silently produce meaningless totals.
-    season_ids = resolve_season_ids(db)
+    # ?career=1 means "every game, all years, all leagues" — the one
+    # case where we deliberately do NOT filter by season_id at all,
+    # rather than resolving to a list of them.
+    if request.args.get("career") == "1":
+        where_clause = ""
+        params = []
+    else:
+        season_ids = resolve_season_ids(db)
+        if not season_ids:
+            return jsonify([])
+        placeholders = ",".join("?" for _ in season_ids)
+        where_clause = f"WHERE g.season_id IN ({placeholders})"
+        params = season_ids
 
-    if not season_ids:
-        return jsonify([])
-
-    placeholders = ",".join("?" for _ in season_ids)
     rows = db.execute(
         f"""
         SELECT p.id, p.name,
@@ -97,9 +102,9 @@ def get_players():
         FROM plate_appearances pa
         JOIN players p ON pa.player_id = p.id
         JOIN games g ON pa.game_id = g.id
-        WHERE g.season_id IN ({placeholders})
+        {where_clause}
         """,
-        season_ids,
+        params,
     ).fetchall()
 
     # Aggregate in Python rather than SQL here — the AB/hit

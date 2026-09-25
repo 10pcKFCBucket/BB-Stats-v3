@@ -1,73 +1,117 @@
-// STEP 3: sorting and filtering, built on top of step 2's render logic.
-//
-// The key idea: keep the *original* data in one variable, and re-render
-// from it every time the user sorts or filters. We never mutate the
-// original array in place — we always sort/filter a copy. That way
-// "clear the search box" or "click a different column" can always start
-// fresh from the same source of truth instead of fighting stale data.
+// Two dropdowns now: one for year, one for league within that year
+// (or "All Leagues" / "Career" as special cases). The year dropdown
+// drives what options appear in the league dropdown.
 
 let allPlayers = [];          // the full list, loaded once from the API
 let sortKey = null;           // which field we're currently sorted by
 let sortDirection = 1;        // 1 = ascending, -1 = descending
+let seasonsByYear = new Map(); // year -> [{id, league}, ...], filled in by loadSeasons
 
 async function init() {
   await loadSeasons();
   setupSorting();
   setupFiltering();
-  document.getElementById("season-select").addEventListener("change", loadStats);
+  document.getElementById("year-select").addEventListener("change", () => {
+    populateLeagueOptions();
+    loadStats();
+  });
+  document.getElementById("league-select").addEventListener("change", loadStats);
   await loadStats();
 }
 
 async function loadSeasons() {
-  const select = document.getElementById("season-select");
+  const yearSelect = document.getElementById("year-select");
 
   try {
     const response = await fetch("/api/seasons");
     const seasons = await response.json();
 
-    // Group seasons by year, in the order the API already gives them
-    // (most recent year first). A Map (rather than a plain object)
-    // keeps that order intact when we loop back over it below.
-    const byYear = new Map();
+    // Group by year so the league dropdown can be rebuilt from this
+    // whenever the year changes, without fetching again.
+    seasonsByYear = new Map();
     seasons.forEach((season) => {
-      if (!byYear.has(season.year)) byYear.set(season.year, []);
-      byYear.get(season.year).push(season);
+      if (!seasonsByYear.has(season.year)) seasonsByYear.set(season.year, []);
+      seasonsByYear.get(season.year).push(season);
     });
 
-    select.innerHTML = "";
+    yearSelect.innerHTML = "";
 
-    for (const [year, seasonsInYear] of byYear) {
-      // Only offer an "All Leagues" option for years that actually
-      // have more than one league — no point cluttering the dropdown
-      // with a redundant duplicate entry for years with just one.
-      if (seasonsInYear.length > 1) {
-        const allOption = document.createElement("option");
-        allOption.value = `year:${year}`;
-        allOption.textContent = `${year} — All Leagues`;
-        select.appendChild(allOption);
-      }
+    const careerOption = document.createElement("option");
+    careerOption.value = "career";
+    careerOption.textContent = "Career (All Years)";
+    yearSelect.appendChild(careerOption);
 
-      seasonsInYear.forEach((season) => {
-        const option = document.createElement("option");
-        option.value = `season:${season.id}`;
-        option.textContent = `${year} — ${season.league}`;
-        select.appendChild(option);
-      });
+    // Map preserves insertion order, and the API already returns
+    // seasons most-recent-year-first, so this loop naturally lists
+    // years newest to oldest.
+    for (const year of seasonsByYear.keys()) {
+      const option = document.createElement("option");
+      option.value = year;
+      option.textContent = year;
+      yearSelect.appendChild(option);
     }
+
+    // Default to the most recent actual year, not "Career" — the
+    // career option is opt-in, not the default view.
+    if (seasonsByYear.size > 0) {
+      yearSelect.value = [...seasonsByYear.keys()][0];
+    }
+
+    populateLeagueOptions();
   } catch (error) {
     console.error("Couldn't load seasons:", error);
   }
 }
 
+function populateLeagueOptions() {
+  const yearSelect = document.getElementById("year-select");
+  const leagueSelect = document.getElementById("league-select");
+  const year = yearSelect.value;
+
+  leagueSelect.innerHTML = "";
+
+  if (year === "career") {
+    // A league selection is meaningless in career mode — one games,
+    // one disabled placeholder option so it's clearly not usable
+    // rather than confusingly still clickable.
+    const option = document.createElement("option");
+    option.textContent = "N/A";
+    leagueSelect.appendChild(option);
+    leagueSelect.disabled = true;
+    return;
+  }
+
+  leagueSelect.disabled = false;
+  const leaguesInYear = seasonsByYear.get(Number(year)) || [];
+
+  if (leaguesInYear.length > 1) {
+    const allOption = document.createElement("option");
+    allOption.value = "all";
+    allOption.textContent = "All Leagues";
+    leagueSelect.appendChild(allOption);
+  }
+
+  leaguesInYear.forEach((season) => {
+    const option = document.createElement("option");
+    option.value = season.id;
+    option.textContent = season.league;
+    leagueSelect.appendChild(option);
+  });
+}
+
 async function loadStats() {
   const tableBody = document.getElementById("stats-body");
-  const select = document.getElementById("season-select");
+  const yearSelect = document.getElementById("year-select");
+  const leagueSelect = document.getElementById("league-select");
 
-  // The dropdown's selected value is either "season:<id>" or
-  // "year:<year>" (see loadSeasons above) — split on the colon to
-  // figure out which query param the API expects.
-  const [kind, value] = (select.value || "").split(":");
-  const queryParam = kind === "year" ? `year=${value}` : `season_id=${value}`;
+  let queryParam;
+  if (yearSelect.value === "career") {
+    queryParam = "career=1";
+  } else if (leagueSelect.value === "all") {
+    queryParam = `year=${yearSelect.value}`;
+  } else {
+    queryParam = `season_id=${leagueSelect.value}`;
+  }
 
   try {
     const response = await fetch(`/api/players?${queryParam}`);
@@ -84,7 +128,7 @@ async function loadStats() {
     applySortAndFilter();
   } catch (error) {
     console.error("Couldn't load stats:", error);
-    tableBody.innerHTML = `<tr><td colspan="8" class="loading">Couldn't load stats. Check the console.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="17" class="loading">Couldn't load stats. Check the console.</td></tr>`;
   }
 }
 
@@ -93,7 +137,7 @@ function render(players) {
   const tableBody = document.getElementById("stats-body");
 
   if (players.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="8" class="loading">No players match that search.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="17" class="loading">No players match that search.</td></tr>`;
     return;
   }
 
@@ -108,8 +152,8 @@ function render(players) {
         <td>${player.singles}</td>
         <td>${player.doubles}</td>
         <td>${player.triples}</td>
-        <td>${player.walks}</td>
         <td>${player.homeRuns}</td>
+        <td>${player.walks}</td>
         <td>${player.rbi}</td>
         <td>${player.runs}</td>
         <td>${player.totalBases}</td>
@@ -143,7 +187,7 @@ function setupSorting() {
         sortDirection *= -1;
       } else {
         sortKey = key;
-        sortDirection = 1;
+        sortDirection = -1;
       }
 
       updateSortIndicators(headers, header);

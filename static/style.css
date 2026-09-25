@@ -146,7 +146,8 @@ main {
   flex-wrap: wrap;
 }
 
-#season-select {
+#year-select,
+#league-select {
   padding: 0.6rem 0.8rem;
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -157,9 +158,16 @@ main {
   flex: 0 0 auto;
 }
 
-#season-select:focus {
+#year-select:focus,
+#league-select:focus {
   outline: 2px solid var(--field-green-light);
   outline-offset: 1px;
+}
+
+#league-select:disabled {
+  background: #f0ece0;
+  color: #a39d8c;
+  cursor: not-allowed;
 }
 
 #player-search {
